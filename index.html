@@ -32,6 +32,7 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s ease, box-shadow 0.3s ease,
           transform 0.3s ease;
+        margin-top: 20px; /* Added margin for better spacing */
       }
       .button:hover {
         background-color: #3791c6;
@@ -42,15 +43,22 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
+      #loginBtn {
+        display: block;
+        width: 200px;
+        margin: 0 auto;
+      }
     </style>
   </head>
   <body>
     <button class="button" id="loginBtn">Login</button>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script>
-      document
-        .getElementById('loginBtn')
-        .addEventListener('click', function () {
+      const loginButton = document.getElementById('loginBtn')
+
+      loginButton.addEventListener('click', function () {
+        if (loginButton.textContent === 'Login') {
           Swal.fire({
             title: 'Login to NosDAV',
             html:
@@ -61,25 +69,38 @@
               '<button class="button" id="submitBtn">Submit</button>' +
               '<p><a target="_blank" href="https://nostrapps.github.io/extensions/">What is a nostr extension?</a></p>',
             showCancelButton: false,
-            showConfirmButton: false
+            showConfirmButton: false,
+            preConfirm: () => {
+              const loginExtension =
+                Swal.getPopup().querySelector('#extensionBtn')
+              const submitButton = Swal.getPopup().querySelector('#submitBtn')
+              const nsecInput =
+                Swal.getPopup().querySelector('#nsecInput').value
+              if (loginExtension) {
+                loginExtension.click()
+              } else if (submitButton && nsecInput) {
+                submitButton.click()
+              }
+            }
           })
-        })
+        } else {
+          // Handle logout and revert button text to 'Login'
+          loginButton.textContent = 'Login'
+        }
+      })
 
-      // Event delegation for buttons inside SweetAlert2 modal
-      // Event delegation for buttons inside SweetAlert2 modal
       document.addEventListener('click', async function (e) {
         if (e.target.id === 'extensionBtn') {
           // Handle the 'Login with Extension' button click
           try {
-            // Using await to wait for the promise to resolve
             const publicKey = await window.nostr.getPublicKey()
             Swal.fire({
               icon: 'success',
               title: 'Logged in successfully!',
               text: 'Your public key is ' + publicKey
             })
+            loginButton.textContent = publicKey.substring(0, 16) // Show first 16 chars of publicKey
           } catch (error) {
-            // If an error occurs, display it
             Swal.fire({
               icon: 'error',
               title: 'Error',
@@ -87,16 +108,14 @@
             })
           }
         } else if (e.target.id === 'submitBtn') {
-          // Handle the 'Submit' button click...
-          // No changes needed here as there's no promise to catch
           // Handle the 'Submit' button click
-          var nsecInput = document.getElementById('nsecInput').value
-          // Perform the login using the entered NSEC/Private Key
+          const nsecInput = document.getElementById('nsecInput').value
           Swal.fire({
             icon: 'success',
             title: 'Logged in successfully!',
             text: 'You have entered: ' + nsecInput
           })
+          loginButton.textContent = nsecInput.substring(0, 16) // Show first 16 chars of NSEC/Private Key
         }
       })
     </script>
