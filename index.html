@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NosDAV Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -18,7 +21,6 @@
         align-items: center;
         height: 100vh;
       }
-
       .button {
         background-color: #4aafd7;
         color: #fff;
@@ -31,13 +33,11 @@
         transition: background-color 0.3s ease, box-shadow 0.3s ease,
           transform 0.3s ease;
       }
-
       .button:hover {
         background-color: #3791c6;
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         transform: translateY(-2px);
       }
-
       .button:active {
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -46,8 +46,7 @@
   </head>
   <body>
     <button class="button" id="loginBtn">Login</button>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script>
       document
         .getElementById('loginBtn')
@@ -62,34 +61,44 @@
               '<button class="button" id="submitBtn">Submit</button>' +
               '<p><a target="_blank" href="https://nostrapps.github.io/extensions/">What is a nostr extension?</a></p>',
             showCancelButton: false,
-            showConfirmButton: false,
-            didOpen: () => {
-              document
-                .getElementById('extensionBtn')
-                .addEventListener('click', function () {
-                  window.nostr.getPublicKey().then(function (publicKey) {
-                    Swal.fire({
-                      icon: 'success',
-                      title: 'Logged in successfully!',
-                      text: 'Your public key is ' + publicKey
-                    })
-                  })
-                })
-              document
-                .getElementById('submitBtn')
-                .addEventListener('click', function () {
-                  var nsecInput = document.getElementById('nsecInput').value
-                  // Perform the login using the entered NSEC/Private Key
-                  // You will need to implement the logic for logging in with the NSEC/Private Key
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Logged in successfully!',
-                    text: 'You have entered: ' + nsecInput
-                  })
-                })
-            }
+            showConfirmButton: false
           })
         })
+
+      // Event delegation for buttons inside SweetAlert2 modal
+      // Event delegation for buttons inside SweetAlert2 modal
+      document.addEventListener('click', async function (e) {
+        if (e.target.id === 'extensionBtn') {
+          // Handle the 'Login with Extension' button click
+          try {
+            // Using await to wait for the promise to resolve
+            const publicKey = await window.nostr.getPublicKey()
+            Swal.fire({
+              icon: 'success',
+              title: 'Logged in successfully!',
+              text: 'Your public key is ' + publicKey
+            })
+          } catch (error) {
+            // If an error occurs, display it
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred: ' + error.message
+            })
+          }
+        } else if (e.target.id === 'submitBtn') {
+          // Handle the 'Submit' button click...
+          // No changes needed here as there's no promise to catch
+          // Handle the 'Submit' button click
+          var nsecInput = document.getElementById('nsecInput').value
+          // Perform the login using the entered NSEC/Private Key
+          Swal.fire({
+            icon: 'success',
+            title: 'Logged in successfully!',
+            text: 'You have entered: ' + nsecInput
+          })
+        }
+      })
     </script>
   </body>
 </html>
